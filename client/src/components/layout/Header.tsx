@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { useQuery } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
+import { User } from '@shared/schema';
 
 export default function Header() {
   const [location, navigate] = useLocation();
@@ -13,11 +14,13 @@ export default function Header() {
   const { toast } = useToast();
 
   // Fetch current user
-  const { data: user, isLoading } = useQuery({
+  const { data: user, isLoading } = useQuery<User | null>({
     queryKey: ['/api/auth/me'],
     retry: false,
-    onError: () => {
-      // Silently fail - user is not logged in
+    gcTime: 0, // Don't cache failed auth requests
+    staleTime: 30000, // Cache successful auth for 30 seconds
+    meta: {
+      on401: "returnNull" // Silently handle auth failures
     }
   });
 
@@ -94,20 +97,14 @@ export default function Header() {
           
           {/* Navigation Links - Desktop */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link href="/">
-              <a className={`font-medium hover:text-primary transition-custom ${location === '/' ? 'text-primary' : ''}`}>
-                Home
-              </a>
+            <Link href="/" className={`font-medium hover:text-primary transition-custom ${location === '/' ? 'text-primary' : ''}`}>
+              Home
             </Link>
-            <Link href="/tractors">
-              <a className={`font-medium hover:text-primary transition-custom ${location === '/tractors' ? 'text-primary' : ''}`}>
-                Browse Tractors
-              </a>
+            <Link href="/tractors" className={`font-medium hover:text-primary transition-custom ${location === '/tractors' ? 'text-primary' : ''}`}>
+              Browse Tractors
             </Link>
-            <Link href="/sell">
-              <a className={`font-medium hover:text-primary transition-custom ${location === '/sell' ? 'text-primary' : ''}`}>
-                Sell Your Tractor
-              </a>
+            <Link href="/sell" className={`font-medium hover:text-primary transition-custom ${location === '/sell' ? 'text-primary' : ''}`}>
+              Sell Your Tractor
             </Link>
             <a href="#how-it-works" className="font-medium hover:text-primary transition-custom">
               How It Works
@@ -121,25 +118,19 @@ export default function Header() {
           <div className="flex items-center space-x-4">
             {user ? (
               <>
-                <Link href="/dashboard">
-                  <a className="hidden md:block hover:text-primary transition-custom">
-                    <i className="far fa-user text-xl"></i>
-                  </a>
+                <Link href="/dashboard" className="hidden md:block hover:text-primary transition-custom">
+                  <i className="far fa-user text-xl"></i>
                 </Link>
-                {user.isAdmin && (
-                  <Link href="/admin">
-                    <a className="hidden md:block hover:text-primary transition-custom">
-                      <i className="fas fa-cog text-xl"></i>
-                    </a>
+                {user && user.isAdmin && (
+                  <Link href="/admin" className="hidden md:block hover:text-primary transition-custom">
+                    <i className="fas fa-cog text-xl"></i>
                   </Link>
                 )}
               </>
             ) : (
-              <Link href="/login">
-                <a className="hidden md:flex items-center hover:text-primary transition-custom">
-                  <i className="far fa-user text-xl mr-1"></i>
-                  <span>Login</span>
-                </a>
+              <Link href="/login" className="hidden md:flex items-center hover:text-primary transition-custom">
+                <i className="far fa-user text-xl mr-1"></i>
+                <span>Login</span>
               </Link>
             )}
             <button
@@ -203,20 +194,14 @@ export default function Header() {
               transition={{ duration: 0.2 }}
             >
               <nav className="flex flex-col space-y-4">
-                <Link href="/">
-                  <a className="font-medium py-2 px-4 hover:bg-neutral-100 rounded-lg transition-custom">
-                    Home
-                  </a>
+                <Link href="/" className="font-medium py-2 px-4 hover:bg-neutral-100 rounded-lg transition-custom">
+                  Home
                 </Link>
-                <Link href="/tractors">
-                  <a className="font-medium py-2 px-4 hover:bg-neutral-100 rounded-lg transition-custom">
-                    Browse Tractors
-                  </a>
+                <Link href="/tractors" className="font-medium py-2 px-4 hover:bg-neutral-100 rounded-lg transition-custom">
+                  Browse Tractors
                 </Link>
-                <Link href="/sell">
-                  <a className="font-medium py-2 px-4 hover:bg-neutral-100 rounded-lg transition-custom">
-                    Sell Your Tractor
-                  </a>
+                <Link href="/sell" className="font-medium py-2 px-4 hover:bg-neutral-100 rounded-lg transition-custom">
+                  Sell Your Tractor
                 </Link>
                 <a href="#how-it-works" className="font-medium py-2 px-4 hover:bg-neutral-100 rounded-lg transition-custom">
                   How It Works
@@ -228,16 +213,12 @@ export default function Header() {
                 <div className="border-t border-neutral-200 pt-2 flex flex-col space-y-2 px-4">
                   {user ? (
                     <>
-                      <Link href="/dashboard">
-                        <a className="py-2 hover:text-primary transition-custom">
-                          <i className="far fa-user text-lg mr-2"></i> Dashboard
-                        </a>
+                      <Link href="/dashboard" className="py-2 hover:text-primary transition-custom">
+                        <i className="far fa-user text-lg mr-2"></i> Dashboard
                       </Link>
                       {user.isAdmin && (
-                        <Link href="/admin">
-                          <a className="py-2 hover:text-primary transition-custom">
-                            <i className="fas fa-cog text-lg mr-2"></i> Admin Panel
-                          </a>
+                        <Link href="/admin" className="py-2 hover:text-primary transition-custom">
+                          <i className="fas fa-cog text-lg mr-2"></i> Admin Panel
                         </Link>
                       )}
                       <button 
@@ -249,15 +230,11 @@ export default function Header() {
                     </>
                   ) : (
                     <>
-                      <Link href="/login">
-                        <a className="py-2 hover:text-primary transition-custom">
-                          <i className="far fa-user text-lg mr-2"></i> Login
-                        </a>
+                      <Link href="/login" className="py-2 hover:text-primary transition-custom">
+                        <i className="far fa-user text-lg mr-2"></i> Login
                       </Link>
-                      <Link href="/register">
-                        <a className="py-2 hover:text-primary transition-custom">
-                          <i className="fas fa-user-plus text-lg mr-2"></i> Register
-                        </a>
+                      <Link href="/register" className="py-2 hover:text-primary transition-custom">
+                        <i className="fas fa-user-plus text-lg mr-2"></i> Register
                       </Link>
                     </>
                   )}
