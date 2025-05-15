@@ -6,6 +6,8 @@ import MemoryStore from "memorystore";
 import { isAuthenticated, isAdmin } from "./middleware/auth.middleware";
 import { handleImageUpload, handleVideoUpload } from "./middleware/upload.middleware";
 import express from "express";
+import { db } from "./db";
+import { users } from "@shared/schema";
 
 // Controllers
 import * as userController from "./controllers/user.controller";
