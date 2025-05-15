@@ -216,7 +216,7 @@ export default function Header() {
                       <Link href="/dashboard" className="py-2 hover:text-primary transition-custom">
                         <i className="far fa-user text-lg mr-2"></i> Dashboard
                       </Link>
-                      {user.isAdmin && (
+                      {user && user.isAdmin && (
                         <Link href="/admin" className="py-2 hover:text-primary transition-custom">
                           <i className="fas fa-cog text-lg mr-2"></i> Admin Panel
                         </Link>
